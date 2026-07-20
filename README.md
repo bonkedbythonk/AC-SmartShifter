@@ -1,4 +1,4 @@
-# Shiftermod
+# SmartShifter
 
 A custom automatic transmission mod for Assetto Corsa. It reads telemetry to shift gears logically instead of relying on speed tables.
 
@@ -9,7 +9,7 @@ A custom automatic transmission mod for Assetto Corsa. It reads telemetry to shi
 - **Auto-calibration:** Hold full throttle in neutral for 1.5s to calibrate your car's redline. It saves permanently so you only do it once per car.
 
 ### Installation
-1. Download `Shiftermod.zip` from the Releases page.
+1. Download `SmartShifter.zip` from the Releases page.
 2. Drag and drop the zip into Content Manager.
 3. Enable it under Settings -> Assetto Corsa -> Python Apps.
 

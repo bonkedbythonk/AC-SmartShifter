@@ -261,7 +261,7 @@ def on_mode_click(*args):
 
 def acMain(ac_version):
     global state
-    state['appWindow'] = ac.newApp("Shifter Mod")
+    state['appWindow'] = ac.newApp("SmartShifter")
     ac.setSize(state['appWindow'], 300, 90)
     
     ac.setTitle(state['appWindow'], "")
@@ -287,7 +287,7 @@ def acMain(ac_version):
     load_calibration()
     update_ui_colors()
     
-    return "Shifter Mod"
+    return "SmartShifter"
 
 def acUpdate(deltaT):
     state['clock'] += deltaT
