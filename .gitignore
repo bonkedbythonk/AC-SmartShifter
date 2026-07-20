@@ -1,0 +1,5 @@
+calibrations.json
+__pycache__/
+*.pyc
+*.zip
+release/
