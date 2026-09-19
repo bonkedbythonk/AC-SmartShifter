@@ -1,5 +1,9 @@
-calibrations.json
+# per-install state, never commit
+apps/python/SmartShifter/settings.json
+apps/python/SmartShifter/calibrations.json
+**/trace.csv
 __pycache__/
 *.pyc
 *.zip
 release/
+tests/py/

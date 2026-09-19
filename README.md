@@ -1,19 +1,30 @@
 # SmartShifter
 
-A custom automatic transmission mod for Assetto Corsa. It reads telemetry to shift gears logically instead of relying on speed tables.
+An automatic gearbox for Assetto Corsa that shifts on what the car is doing, not on a speed table.
 
-### Features
-- **Dynamic shifting:** Shift points scale with how hard you press the gas and brake.
-- **Wheelspin detection:** Won't randomly shift up while you're doing a burnout or sliding.
-- **Driving modes:** Press 'M' to cycle between Comfort (cruising/low RPM), Sport, Sport+ (track), Drift (bounces limiter), and Manual.
-- **Auto-calibration:** Hold full throttle in neutral for 1.5s to calibrate your car's redline. It saves permanently so you only do it once per car.
+- **Dynamic shift points** that scale with throttle and brake.
+- **Holds gears** while cornering and while the driven wheels are spinning up.
+- **Five modes:** Comfort (low revs, early upshifts), Sport, Sport+ (track), Drift (sits on the limiter) and Manual.
+- **No calibration.** Redline, idle and gear count come straight from the sim.
 
-### Installation
-1. Download `SmartShifter.zip` from the Releases page.
-2. Drag and drop the zip into Content Manager.
-3. Enable it under Settings -> Assetto Corsa -> Python Apps.
+## Requirements
 
-### Usage
-- Open the app in-game from the right side menu.
-- Press **M** to switch driving modes.
-- Hold **M** for 1.5s to delete a car's saved calibration.
+[Custom Shaders Patch](https://acstuff.club/patch/) 0.2.x. The app reads the car's limiter, idle, gear count and wheel slip through CSP's Lua API and shifts through `ac.overrideCarControls`, so it works with any input device and on any server that runs CSP.
+
+## Installation
+
+Drag the release zip onto Content Manager, or copy `apps/lua/SmartShifter` into `assettocorsa/apps/lua/`. The app appears in the in-game app bar as **SmartShifter**.
+
+## Usage
+
+- Press **M** to cycle Comfort → Sport → Sport+ → Drift → Manual. The key is rebindable in Content Manager under **Settings → Controls → Patch → SmartShifter/Cycle Mode**.
+- Clicking the app window also cycles modes.
+- The selected mode is remembered between sessions.
+
+## Python fallback (no CSP)
+
+`apps/python/SmartShifter` is an older build for installs without CSP. It reads the redline from AC's shared memory, takes the shift keys from your `controls.ini`, and sends them as keypresses. Enable it under **Settings → Assetto Corsa → Python Apps**, and do **not** run it together with the Lua app. An optional `settings.json` next to it overrides the mode key: `{"mode_key": 77}` (decimal virtual-key code; 77 is M).
+
+## Development
+
+`tests/` contains an offline harness that runs the Python build's shift logic against real car data from your AC install. See [tests/README.md](tests/README.md).
