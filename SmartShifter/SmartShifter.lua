@@ -13,7 +13,9 @@
 --     Right-click the app to forget a learned redline.
 --   * Stands down while AC's own auto-shift assist is on (they would fight).
 --   * Shows a warning if the server/session blocks the controls override,
---     or if auto-clutch is off (you then have to clutch at a stop yourself).
+--     and a one-time note if auto-clutch is off (clutch at a stop yourself).
+-- v2.2: hard guards so a downshift can never land in neutral and nothing
+--   shifts out of neutral/reverse, even if another shifter app is running.
 
 local MODE_COMFORT, MODE_SPORT, MODE_SPORTPLUS, MODE_DRIFT, MODE_MANUAL = 0, 1, 2, 3, 4
 local MODE_NAMES = { 'COMFORT', 'SPORT', 'SPORT+', 'DRIFT', 'MANUAL' }
@@ -58,6 +60,7 @@ local state = {
   controlsSince = nil,    -- clock when the override was first requested
   overrideBlocked = false,
   status = '',            -- persistent warning line
+  clutchWarned = false,
 }
 
 local controls = nil
@@ -98,7 +101,16 @@ local function cycleMode()
   setMode((state.mode + 1) % #MODE_NAMES)
 end
 
+-- Hard guards: this app never shifts out of reverse/neutral, and never
+-- below first. Whatever the logic above decides, a request that would land
+-- in neutral is dropped here.
+local function currentGear()
+  local car = ac.getCar(0)
+  return car and car.gear or 0
+end
+
 local function shiftUp()
+  if currentGear() < 1 then return end
   local c = getControls()
   if c == nil then return end
   c.gearUp = true
@@ -107,6 +119,10 @@ local function shiftUp()
 end
 
 local function shiftDown()
+  if currentGear() <= 1 then
+    state.pendingDown = 0
+    return
+  end
   local c = getControls()
   if c == nil then return end
   c.gearDown = true
@@ -322,10 +338,15 @@ function script.update(dt)
     state.status = 'Turn off AC auto-shift assist'
   elseif redline <= 0 then
     state.status = 'Floor it once to learn redline'
-  elseif not car.autoClutch then
-    state.status = 'Auto-clutch off: clutch at stops'
   else
     state.status = ''
+  end
+
+  -- Auto-clutch off is worth knowing, not worth a permanent banner: say it
+  -- once per session, and only when an automatic mode is selected.
+  if not car.autoClutch and not state.clutchWarned and state.mode ~= MODE_MANUAL then
+    state.clutchWarned = true
+    notify('Auto-clutch off: clutch at stops', 5.0)
   end
 
   if redline <= 0 or car.autoShift then return end
