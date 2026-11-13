@@ -12,11 +12,12 @@
 --   * Redline: CSP limiter -> engine.ini LIMITER -> learned (saved per car).
 --     Right-click the app to forget a learned redline.
 --   * Stands down while AC's own auto-shift assist is on (they would fight).
---   * Shows a warning if the server/session blocks the controls override,
---     and a one-time note if auto-clutch is off (clutch at a stop yourself).
+--   * Shows a warning if the server/session blocks the controls override.
 -- v2.2: hard guards so a downshift can never land in neutral and nothing
 --   shifts out of neutral/reverse, even if another shifter app is running.
 -- v2.3: MANUAL is fully hands-off (anti-stall no longer runs there).
+-- v2.4: built for driving without assists: all automatic shifting (and
+--   anti-stall) pauses while the clutch pedal is in; auto-clutch note gone.
 
 local MODE_COMFORT, MODE_SPORT, MODE_SPORTPLUS, MODE_DRIFT, MODE_MANUAL = 0, 1, 2, 3, 4
 local MODE_NAMES = { 'COMFORT', 'SPORT', 'SPORT+', 'DRIFT', 'MANUAL' }
@@ -61,7 +62,6 @@ local state = {
   controlsSince = nil,    -- clock when the override was first requested
   overrideBlocked = false,
   status = '',            -- persistent warning line
-  clutchWarned = false,
 }
 
 local controls = nil
@@ -343,13 +343,6 @@ function script.update(dt)
     state.status = ''
   end
 
-  -- Auto-clutch off is worth knowing, not worth a permanent banner: say it
-  -- once per session, and only when an automatic mode is selected.
-  if not car.autoClutch and not state.clutchWarned and state.mode ~= MODE_MANUAL then
-    state.clutchWarned = true
-    notify('Auto-clutch off: clutch at stops', 5.0)
-  end
-
   if redline <= 0 or car.autoShift then return end
 
   local idle = idleFor(car)
@@ -375,6 +368,11 @@ function script.update(dt)
 
   -- MANUAL means hands off: no anti-stall, no shifting of any kind.
   if state.mode == MODE_MANUAL then return end
+
+  -- Driver has the clutch in (car.clutch: 1 = engaged, 0 = pedal floored).
+  -- Engine rpm then says nothing about road speed, so neither anti-stall nor
+  -- the shift logic may act on it. Resumes as soon as the clutch is out.
+  if car.clutch < 0.9 then return end
 
   -- Anti-stall, judged against real idle.
   if car.rpm < idle * 1.12 and gear > 1 and car.speedKmh > 3 then
