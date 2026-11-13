@@ -7,7 +7,7 @@ Since v2.0 it is a Custom Shaders Patch (CSP) Lua app. It shifts through CSP's c
 ### Features
 - **Dynamic shifting:** Shift points scale with how hard you press the gas and brake.
 - **Wheelspin detection:** Won't shift up while you're doing a burnout or sliding (reads per-wheel slip from CSP).
-- **Driving modes:** Press **M** (or click the app) to cycle between Comfort (cruising/low RPM), Sport, Sport+ (track), Drift (bounces limiter), and Manual.
+- **Driving modes:** Press **M** (or click the app) to cycle between Comfort (cruising/low RPM), Sport, Sport+ (track), Drift (bounces limiter), and Manual (fully hands-off, no anti-stall).
 - **Works with any car:** Redline, idle and gear count come from the car itself. Cars with no rev limiter fall back to the limiter in `engine.ini`, and if that has none either, you floor it once and it learns and saves the redline for that car.
 - **Online-friendly:** Never touches reverse or neutral. Warns you if a server blocks the shifts or AC's own auto-shift assist is on, and notes once if auto-clutch is off.
 

@@ -16,6 +16,7 @@
 --     and a one-time note if auto-clutch is off (clutch at a stop yourself).
 -- v2.2: hard guards so a downshift can never land in neutral and nothing
 --   shifts out of neutral/reverse, even if another shifter app is running.
+-- v2.3: MANUAL is fully hands-off (anti-stall no longer runs there).
 
 local MODE_COMFORT, MODE_SPORT, MODE_SPORTPLUS, MODE_DRIFT, MODE_MANUAL = 0, 1, 2, 3, 4
 local MODE_NAMES = { 'COMFORT', 'SPORT', 'SPORT+', 'DRIFT', 'MANUAL' }
@@ -372,6 +373,9 @@ function script.update(dt)
 
   local spinning = isWheelspinning(car)
 
+  -- MANUAL means hands off: no anti-stall, no shifting of any kind.
+  if state.mode == MODE_MANUAL then return end
+
   -- Anti-stall, judged against real idle.
   if car.rpm < idle * 1.12 and gear > 1 and car.speedKmh > 3 then
     if state.clock - state.lastShiftTime > 0.3 then
@@ -380,8 +384,6 @@ function script.update(dt)
       return
     end
   end
-
-  if state.mode == MODE_MANUAL then return end
 
   local target = autoShiftTarget(car, redline, idle, spinning)
 
